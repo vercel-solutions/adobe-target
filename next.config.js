@@ -1,5 +1,3 @@
-module.exports = {
-  images: {
-    domains: ['store.storeimages.cdn-apple.com'],
-  },
-}
+const withTM = require('@vercel/examples-ui/transpile')();
+
+module.exports = withTM();
