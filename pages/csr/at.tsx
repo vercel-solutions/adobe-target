@@ -5,7 +5,7 @@ import { STORE_CLOSED } from 'lib/flags';
 import { useAdobeAt } from 'lib/use-adobe-at';
 import AdobeAtLayout from 'components/adobe-at-layout';
 
-export default function CSRAt() {
+export default function CSRAt({ blocking = false }: { blocking: boolean }) {
   // Target is loaded by `AdobeAtLayout`
   const target = useAdobeAt();
   const router = useRouter();
@@ -16,10 +16,19 @@ export default function CSRAt() {
   // It's better to use Router events for more advanced scenarios:
   // https://nextjs.org/docs/api-reference/next/router#routerevents
   useEffect(() => {
-    if (router.isReady && !done && target) {
+    if (done) return;
+
+    // Hide the contents of the page until Target offer loads.
+    // The page will load faster, but it will have flickering (CLS)
+    if (blocking) document.documentElement.style.opacity = '0';
+
+    if (router.isReady && target) {
       setDone(true);
 
+      // https://experienceleague.adobe.com/docs/target/using/implement-target/client-side/at-js-implementation/functions-overview/adobe-target-triggerview-atjs-2.html?lang=en
       target.triggerView('/csr/at');
+
+      // https://experienceleague.adobe.com/docs/target/using/implement-target/client-side/at-js-implementation/functions-overview/adobe-target-getoffer.html?lang=en
       target.getOffer({
         mbox: STORE_CLOSED,
         timeout: 1000,
@@ -40,9 +49,12 @@ export default function CSRAt() {
           } else {
             setExp('default');
           }
+
+          if (blocking) document.documentElement.style.opacity = '1';
         },
         error(status, error) {
           console.log('Error:', status, error);
+          if (blocking) document.documentElement.style.opacity = '1';
         },
       });
     }
@@ -53,7 +65,7 @@ export default function CSRAt() {
       <Text variant="h1" className="mb-6">
         CSR Page with at.js
       </Text>
-      <Text className="text-lg mb-4">
+      <Text className="mb-4">
         The contents of the text below are loaded based on the variant:
       </Text>
       {expValue === 'expB' ? (
