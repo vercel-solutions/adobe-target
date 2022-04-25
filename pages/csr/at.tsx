@@ -28,6 +28,27 @@ export default function CSRAt({ blocking = false }: { blocking: boolean }) {
       // https://experienceleague.adobe.com/docs/target/using/implement-target/client-side/at-js-implementation/functions-overview/adobe-target-triggerview-atjs-2.html?lang=en
       target.triggerView('/csr/at');
 
+      // Note: `target.getOffers` also works here
+      //
+      // target
+      //   .getOffers({
+      //     timeout: 1000,
+      //     request: {
+      //       prefetch: {
+      //         mboxes: [
+      //           {
+      //             index: 0,
+      //             name: STORE_CLOSED,
+      //           },
+      //         ],
+      //       },
+      //     },
+      //   })
+      //   .then((response) => {
+      //     return target.applyOffers({ response });
+      //   })
+      //   .catch(console.error);
+
       // https://experienceleague.adobe.com/docs/target/using/implement-target/client-side/at-js-implementation/functions-overview/adobe-target-getoffer.html?lang=en
       target.getOffer({
         mbox: STORE_CLOSED,
