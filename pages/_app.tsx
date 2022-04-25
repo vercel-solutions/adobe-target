@@ -1,14 +1,18 @@
-import 'tailwindcss/tailwind.css'
-import type { AppProps } from 'next/app'
-import Nav from 'components/nav'
+import type { AppProps } from 'next/app';
+import type { LayoutProps } from '@vercel/examples-ui/layout';
+import { getLayout } from '@vercel/examples-ui';
+import '@vercel/examples-ui/globals.css';
 
-function MyApp({ Component, pageProps }: AppProps) {
+export default function MyApp({ Component, pageProps }: AppProps) {
+  const Layout = getLayout<LayoutProps>(Component);
+
   return (
-    <>
-      <Nav />
+    <Layout
+      title="AB testing with Adobe Target"
+      path="ab-testing-adobe-target"
+      deployButton={{ env: ['TARGET_CLIENT', 'TARGET_ORGANIZATION_ID'] }}
+    >
       <Component {...pageProps} />
-    </>
-  )
+    </Layout>
+  );
 }
-
-export default MyApp
