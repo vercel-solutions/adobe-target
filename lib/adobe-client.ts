@@ -43,7 +43,6 @@ export default async function getTargetClient() {
           )
         );
       }
-      console.log('Client ready!');
       _client = target;
       resolve(_client);
     }
@@ -55,7 +54,6 @@ export default async function getTargetClient() {
      */
     function onArtifactDownloadSucceeded(event) {
       artifactDownloaded = true;
-      // console.log('Artifact download succeeded:', event);
     }
     function onArtifactDownloadFailed(event) {
       console.error('Artifact download failed:', event);
@@ -67,7 +65,7 @@ export default async function getTargetClient() {
   });
 }
 
-const getTargetOptions = (cookies: Record<string, string>) => ({
+export const getCookies = (cookies: Record<string, string>) => ({
   targetCookie: cookies[encodeURIComponent(targetClient.TargetCookieName)],
   targetLocationHintCookie:
     cookies[encodeURIComponent(targetClient.TargetLocationHintCookieName)],
@@ -79,7 +77,7 @@ export async function getAttributesFromReq(
   ...args: any[]
 ) {
   const target = await getTargetClient();
-  const options = getTargetOptions(
+  const options = getCookies(
     req.cookies || cookie.parse(req.headers.cookie || '')
   );
   // This method triggers an impression:
@@ -104,4 +102,50 @@ export async function getAttributesFromReq(
   );
 
   return attrs;
+}
+
+export async function getOffers(
+  req: IncomingMessage & { cookies?: Record<string, string> },
+  res: ServerResponse,
+  options: Record<string, any>
+) {
+  const target = await getTargetClient();
+  const cookieOptions = getCookies(
+    req.cookies || cookie.parse(req.headers.cookie || '')
+  );
+  // This method triggers an impression:
+  // https://adobetarget-sdks.gitbook.io/docs/core-principles/event-tracking#how-impressions-are-triggered
+  const response = await target.getOffers({ ...cookieOptions, ...options });
+  const { targetCookie, targetLocationHintCookie } = response;
+
+  // Set Target cookies
+  res.setHeader(
+    'Set-Cookie',
+    [
+      cookie.serialize(targetCookie.name, targetCookie.value, {
+        maxAge: targetCookie.maxAge,
+        path: '/',
+      }),
+      cookie.serialize(
+        targetLocationHintCookie.name,
+        targetLocationHintCookie.value,
+        {
+          maxAge: targetLocationHintCookie.maxAge,
+          path: '/',
+        }
+      ),
+    ].filter(Boolean)
+  );
+
+  return response;
+}
+
+export async function sendNotifications(
+  // req: IncomingMessage & { cookies?: Record<string, string> },
+  // res: ServerResponse,
+  options: Record<string, any>
+) {
+  const target = await getTargetClient();
+  console.log('XX', options);
+  return target.sendNotifications(options);
 }
