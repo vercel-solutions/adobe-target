@@ -83,7 +83,7 @@ export default function CSRAt({ blocking = false }: { blocking: boolean }) {
   }, [router.isReady, done, target]);
 
   const handleClick = () => {
-    //https://experienceleague.adobe.com/docs/target/using/implement-target/client-side/at-js-implementation/functions-overview/adobe-target-trackevent.html?lang=en
+    // https://experienceleague.adobe.com/docs/target/using/implement-target/client-side/at-js-implementation/functions-overview/adobe-target-trackevent.html?lang=en
     // Q: how do we relate the event to the offer?
     target.trackEvent({
       mbox: CLICKED_BUTTON,

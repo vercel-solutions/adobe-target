@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
+import type { GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/router';
 import { Page, Text, Link, Button } from '@vercel/examples-ui';
-import getTargetClient from 'lib/adobe-client';
+import { getAttributesFromReq } from 'lib/adobe-client';
 import { useAdobeAt } from 'lib/use-adobe-at';
 import { CLICKED_BUTTON, STORE_CLOSED } from 'lib/flags';
 import AdobeAtLayout from 'components/adobe-at-layout';
 
-export async function getServerSideProps() {
-  const target = await getTargetClient();
-  const res = await target.getAttributes([STORE_CLOSED]);
-  const featureFlag = res.asObject(STORE_CLOSED);
+export async function getServerSideProps({
+  req,
+  res,
+}: GetServerSidePropsContext) {
+  const attrs = await getAttributesFromReq(req, res, [STORE_CLOSED]);
+  const featureFlag = attrs.asObject(STORE_CLOSED);
 
   return {
     props: featureFlag.enabled
@@ -32,22 +35,16 @@ export default function SSRAt({ flag }) {
       target.triggerView('/ssr/at');
 
       if (flag) {
-        // https://experienceleague.adobe.com/docs/target/using/implement-target/client-side/at-js-implementation/functions-overview/adobe-target-applyoffer.html?lang=en
-        // Not sure if this does something without a DOM selector
-        target.applyOffer({
-          mbox: STORE_CLOSED,
-          offer: [
-            {
-              action: 'setJson',
-              content: [
-                {
-                  enabled: flag.enabled,
-                  flag: flag.name,
-                },
-              ],
-            },
-          ],
-        });
+        // https://experienceleague.adobe.com/docs/target/using/implement-target/client-side/at-js-implementation/functions-overview/adobe.target.sendnotifications-atjs-21.html?lang=en
+        // Something like this can work too, but `target.getAttributes` takes care of
+        // registering the initial impression
+        // target.sendNotifications({
+        //   request: {
+        //     notifications: [
+        //       ...
+        //     ],
+        //   },
+        // });
       }
     }
   }, [target, flag]);
@@ -55,7 +52,7 @@ export default function SSRAt({ flag }) {
   const expValue = flag?.enabled ? flag.name : 'default';
 
   const handleClick = () => {
-    //https://experienceleague.adobe.com/docs/target/using/implement-target/client-side/at-js-implementation/functions-overview/adobe-target-trackevent.html?lang=en
+    // https://experienceleague.adobe.com/docs/target/using/implement-target/client-side/at-js-implementation/functions-overview/adobe-target-trackevent.html?lang=en
     // Q: how do we relate the event to the offer?
     target.trackEvent({
       mbox: CLICKED_BUTTON,

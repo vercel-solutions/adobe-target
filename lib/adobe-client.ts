@@ -1,4 +1,6 @@
+import type { IncomingMessage, ServerResponse } from 'http';
 import targetClient from '@adobe/target-nodejs-sdk';
+import cookie from 'cookie';
 
 // We save the client here to avoid creating it multiple times on
 // calls to the same serverless function.
@@ -63,4 +65,43 @@ export default async function getTargetClient() {
     // to use the memory cache of serverless functions.
     const target = targetClient.create(config);
   });
+}
+
+const getTargetOptions = (cookies: Record<string, string>) => ({
+  targetCookie: cookies[encodeURIComponent(targetClient.TargetCookieName)],
+  targetLocationHintCookie:
+    cookies[encodeURIComponent(targetClient.TargetLocationHintCookieName)],
+});
+
+export async function getAttributesFromReq(
+  req: IncomingMessage & { cookies?: Record<string, string> },
+  res: ServerResponse,
+  ...args: any[]
+) {
+  const target = await getTargetClient();
+  const options = getTargetOptions(
+    req.cookies || cookie.parse(req.headers.cookie || '')
+  );
+  // This method triggers an impression:
+  // https://adobetarget-sdks.gitbook.io/docs/core-principles/event-tracking#how-impressions-are-triggered
+  const attrs = await target.getAttributes(...args, options);
+  const response = attrs.getResponse();
+  const { targetCookie, targetLocationHintCookie } = response;
+
+  // Set Target cookies
+  res.setHeader(
+    'Set-Cookie',
+    [
+      cookie.serialize(targetCookie.name, targetCookie.value, {
+        maxAge: targetCookie.maxAge,
+      }),
+      cookie.serialize(
+        targetLocationHintCookie.name,
+        targetLocationHintCookie.value,
+        { maxAge: targetLocationHintCookie.maxAge }
+      ),
+    ].filter(Boolean)
+  );
+
+  return attrs;
 }

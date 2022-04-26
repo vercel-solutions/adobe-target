@@ -17,6 +17,16 @@ export const AdobeAtProvider: FC<ScriptProps> = ({ children, ...props }) => {
 
   return (
     <adobeAtContext.Provider value={client}>
+      {props.strategy !== 'beforeInteractive' && (
+        // If the strategy is not `beforeInteractive` (render blocking) then
+        // we don't need to hide the body
+        <Script>{`
+          window.targetGlobalSettings = {
+            bodyHidingEnabled: false
+          };
+        `}</Script>
+      )}
+
       <Script
         src="/at.js"
         id="adobe-target"
