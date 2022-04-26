@@ -71,52 +71,8 @@ export const getCookies = (cookies: Record<string, string>) => ({
     cookies[encodeURIComponent(targetClient.TargetLocationHintCookieName)],
 });
 
-export async function getAttributesFromReq(
-  req: IncomingMessage & { cookies?: Record<string, string> },
-  res: ServerResponse,
-  ...args: any[]
-) {
-  const target = await getTargetClient();
-  const options = getCookies(
-    req.cookies || cookie.parse(req.headers.cookie || '')
-  );
-  // This method triggers an impression:
-  // https://adobetarget-sdks.gitbook.io/docs/core-principles/event-tracking#how-impressions-are-triggered
-  const attrs = await target.getAttributes(...args, options);
-  const response = attrs.getResponse();
-  const { targetCookie, targetLocationHintCookie } = response;
-
-  // Set Target cookies
-  res.setHeader(
-    'Set-Cookie',
-    [
-      cookie.serialize(targetCookie.name, targetCookie.value, {
-        maxAge: targetCookie.maxAge,
-      }),
-      cookie.serialize(
-        targetLocationHintCookie.name,
-        targetLocationHintCookie.value,
-        { maxAge: targetLocationHintCookie.maxAge }
-      ),
-    ].filter(Boolean)
-  );
-
-  return attrs;
-}
-
-export async function getOffers(
-  req: IncomingMessage & { cookies?: Record<string, string> },
-  res: ServerResponse,
-  options: Record<string, any>
-) {
-  const target = await getTargetClient();
-  const cookieOptions = getCookies(
-    req.cookies || cookie.parse(req.headers.cookie || '')
-  );
-  // This method triggers an impression:
-  // https://adobetarget-sdks.gitbook.io/docs/core-principles/event-tracking#how-impressions-are-triggered
-  const response = await target.getOffers({ ...cookieOptions, ...options });
-  const { targetCookie, targetLocationHintCookie } = response;
+function setTargetCookies(res: ServerResponse, targetResponse: any) {
+  const { targetCookie, targetLocationHintCookie } = targetResponse;
 
   // Set Target cookies
   res.setHeader(
@@ -136,6 +92,41 @@ export async function getOffers(
       ),
     ].filter(Boolean)
   );
+}
+
+export async function getAttributesFromReq(
+  req: IncomingMessage & { cookies?: Record<string, string> },
+  res: ServerResponse,
+  ...args: any[]
+) {
+  const target = await getTargetClient();
+  const options = getCookies(
+    req.cookies || cookie.parse(req.headers.cookie || '')
+  );
+  // This method triggers an impression:
+  // https://adobetarget-sdks.gitbook.io/docs/core-principles/event-tracking#how-impressions-are-triggered
+  const attrs = await target.getAttributes(...args, options);
+  const response = attrs.getResponse();
+
+  setTargetCookies(res, response);
+
+  return attrs;
+}
+
+export async function getOffers(
+  req: IncomingMessage & { cookies?: Record<string, string> },
+  res: ServerResponse,
+  options: Record<string, any>
+) {
+  const target = await getTargetClient();
+  const cookieOptions = getCookies(
+    req.cookies || cookie.parse(req.headers.cookie || '')
+  );
+  // This method triggers an impression:
+  // https://adobetarget-sdks.gitbook.io/docs/core-principles/event-tracking#how-impressions-are-triggered
+  const response = await target.getOffers({ ...cookieOptions, ...options });
+
+  setTargetCookies(res, response);
 
   return response;
 }
@@ -146,6 +137,5 @@ export async function sendNotifications(
   options: Record<string, any>
 ) {
   const target = await getTargetClient();
-  console.log('XX', options);
   return target.sendNotifications(options);
 }
