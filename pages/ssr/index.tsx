@@ -32,7 +32,7 @@ export default function SSRAt({ flag }) {
   }, [flag]);
 
   const handleClick = async () => {
-    const res = await fetch('/api/target/event', {
+    await fetch('/api/target/event', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -42,8 +42,7 @@ export default function SSRAt({ flag }) {
         type: 'click',
       }),
     });
-
-    console.log('R', res);
+    console.log('Event sent!');
   };
 
   return (
