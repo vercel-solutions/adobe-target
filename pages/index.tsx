@@ -1,80 +1,77 @@
-import Image from 'next/image'
+import { Layout, Page, Text, List, Link, Code } from '@vercel/examples-ui';
 
-function ProductCard({ src, href, name }) {
+export default function Index() {
   return (
-    <li className="min-w-[120px]">
-      <a className="flex flex-col" href={href}>
-        <Image width={120} height={78} alt={name} src={src} />
-        <p className="pt-3 whitespace-no-wrap text-sm font-semibold text-center no-underline hover:underline">
-          {name}
-        </p>
-      </a>
-    </li>
-  )
+    <Page>
+      <Text variant="h1" className="mb-6">
+        AB testing with Adobe Target
+      </Text>
+      <Text className="mb-4">
+        The demo showcases multiple ways in which Adobe Target can be used in
+        Next.js pages, using different data fetching and rendering strategies:
+      </Text>
+      <List className="mb-4">
+        <li className="mb-2.5">
+          <Link href="/static-rewrites">
+            /static-rewrites: Static Pages + Middleware Rewrites, events are
+            sent using API Routes
+          </Link>
+        </li>
+        <li className="mb-2.5">
+          <Link href="/csr/at">/csr/at: CSR Page with at.js</Link>
+        </li>
+        <li className="mb-2.5">
+          <Link href="/csr/at-blocking">
+            /csr/at-blocking: CSR Page with at.js blocking rendering until
+            experiment is ready
+          </Link>
+        </li>
+        <li className="mb-2.5">
+          <Link href="/ssr/at">/ssr/at: SSR Page with at.js</Link>
+        </li>
+        <li className="mb-2.5">
+          <Link href="/ssr">
+            /ssr/at: SSR Page where events are sent using API Routes
+          </Link>
+        </li>
+      </List>
+      <Text className="mb-4">The differences between the pages are:</Text>
+      <List className="mb-4">
+        <li className="mb-2.5">
+          Pages under Next.js Middleware take advantage of the{' '}
+          <Link
+            href="https://vercel.com/docs/concepts/edge-network/overview"
+            target="_blank"
+          >
+            Vercel Edge Network
+          </Link>
+          , rewrites should be very fast if the request hits the{' '}
+          <Link
+            href="https://experienceleague.adobe.com/docs/target/using/introduction/how-target-works.html?lang=en"
+            target="_blank"
+          >
+            Target Edge Network
+          </Link>
+        </li>
+        <li className="mb-2.5">
+          Pages that have <Code>at.js</Code> will have a larger JS footprint as
+          it takes <b>33.7kb</b> to load it.
+        </li>
+        <li className="mb-2.5">
+          If the page is blocking until the experiment is ready, like in{' '}
+          <Code>/csr/at-blocking</Code> or <Code>/ssr</Code>, TTFB and FCP are
+          worse than in non-blocking pages
+        </li>
+        <li className="mb-2.5">
+          Pages that call an API route instead of using <Code>at.js</Code> are
+          less likely to get adblocked because the API routes live in the same
+          domain. The API route takes more time to send an event as it's an
+          intermediary, but analytics reporting shouldn't be affecting
+          performance
+        </li>
+      </List>
+    </Page>
+  );
 }
 
-export default function Home() {
-  return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-100">
-      <section className="flex flex-col w-full mx-auto py-7 justify-center bg-white">
-        <p className="text-center">
-          Save on Mac or iPad for college with education pricing. And get
-          AirPods. Shop now →
-        </p>
-      </section>
-      <div className="flex flex-col w-full mx-auto justify-center pt-20 pb-16 font-semibold leading-6 tracking-tight max-w-[900px]">
-        <h1 className="text-5xl max-w-3xl">
-          Store.
-          <span className="ml-4 text-gray-500">
-            The best way to buy the products you love.
-          </span>
-        </h1>
-      </div>
-      <section className="flex flex-col w-full mx-auto py-8  max-w-[900px]">
-        <ul className="inline-flex gap-8 overflow-x-scroll">
-          <ProductCard
-            src="https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/store-card-13-mac-nav-202108?wid=400&hei=260&fmt=png-alpha&.v=1625783380000"
-            name="Mac"
-            href="https://apple.com/shop/buy-mac"
-          />
-          <ProductCard
-            src="https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/store-card-13-iphone-nav-202108_GEO_US?wid=400&hei=260&fmt=png-alpha&.v=1628817965000"
-            name="iPhone"
-            href="https://apple.com/shop/buy-mac"
-          />
-          <ProductCard
-            src="https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/store-card-13-ipad-nav-202108?wid=400&hei=260&fmt=png-alpha&.v=1625783381000"
-            name="iPad"
-            href="https://apple.com/shop/buy-mac"
-          />
-
-          <ProductCard
-            src="https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/store-card-13-watch-nav-202108?wid=400&hei=260&fmt=png-alpha&.v=1625783378000"
-            name="Apple Watch"
-            href="https://apple.com/shop/buy-mac"
-          />
-          <ProductCard
-            src="https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/store-card-13-airpods-nav-202108?wid=400&hei=260&fmt=png-alpha&.v=1627410283000"
-            name="AirPods"
-            href="https://apple.com/shop/buy-mac"
-          />
-          <ProductCard
-            src="https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/store-card-13-airtags-nav-202108?wid=400&hei=260&fmt=png-alpha&.v=1625783380000"
-            name="AirTag"
-            href="https://apple.com/shop/buy-mac"
-          />
-          <ProductCard
-            src="https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/store-card-13-appletv-nav-202108?wid=400&hei=260&fmt=png-alpha&.v=1625783378000"
-            name="Apple TV"
-            href="https://apple.com/shop/buy-mac"
-          />
-          <ProductCard
-            src="https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/store-card-13-homepod-mini-nav-202108?wid=400&hei=260&fmt=png-alpha&.v=1625783386000"
-            name="HomePod mini"
-            href="https://apple.com/shop/buy-mac"
-          />
-        </ul>
-      </section>
-    </div>
-  )
-}
+Index.Layout = Layout;
