@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Page, Text, Link, Button } from '@vercel/examples-ui';
 import { CLICKED_BUTTON, STORE_CLOSED } from 'lib/flags';
-import { useAdobeAt } from 'lib/use-adobe-at';
+import { useAdobeAt } from 'lib/adobe/use-at';
 import AdobeAtLayout from 'components/adobe-at-layout';
 
 export default function CSRAt({ blocking = false }: { blocking: boolean }) {

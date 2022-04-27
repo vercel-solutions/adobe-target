@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
 import { Layout, Page, Text, Link, Button, Code } from '@vercel/examples-ui';
 import { STORE_CLOSED, CLICKED_BUTTON } from 'lib/flags';
-import { sendEvent } from 'lib/adobe-events';
+import { sendEvent } from 'lib/adobe/events';
 
 const FLAG = 'expB';
 const getEventToken = () => Cookies.get(`${FLAG}-etoken`);

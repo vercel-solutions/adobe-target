@@ -4,7 +4,7 @@ import {
   getTargetCookie,
   getTargetLocationHintCookie,
   parseTargetCookie,
-} from './adobe-api-utils';
+} from './rest-api-utils';
 
 const client = process.env.TARGET_CLIENT;
 const organizationId = process.env.TARGET_ORGANIZATION_ID;

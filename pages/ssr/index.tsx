@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import type { GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/router';
 import { Layout, Page, Text, Link, Button } from '@vercel/examples-ui';
-import { getAttributesFromReq } from 'lib/adobe-client';
+import { getAttributesFromReq } from 'lib/adobe/node-client';
 import { STORE_CLOSED, CLICKED_BUTTON } from 'lib/flags';
 
 export async function getServerSideProps({

@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import type { ScriptProps } from 'next/script';
 import { Layout } from '@vercel/examples-ui';
 import type { LayoutProps } from '@vercel/examples-ui/layout';
-import { AdobeAtProvider } from '../lib/use-adobe-at';
+import { AdobeAtProvider } from '../lib/adobe/use-at';
 
 const AdobeAtLayout: FC<
   LayoutProps & { strategy: ScriptProps['strategy'] }

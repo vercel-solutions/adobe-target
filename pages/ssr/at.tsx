@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import type { GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/router';
 import { Page, Text, Link, Button } from '@vercel/examples-ui';
-import { getAttributesFromReq } from 'lib/adobe-client';
-import { useAdobeAt } from 'lib/use-adobe-at';
+import { getAttributesFromReq } from 'lib/adobe/node-client';
+import { useAdobeAt } from 'lib/adobe/use-at';
 import { CLICKED_BUTTON, STORE_CLOSED } from 'lib/flags';
 import AdobeAtLayout from 'components/adobe-at-layout';
 

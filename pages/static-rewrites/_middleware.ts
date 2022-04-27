@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { STORE_CLOSED } from 'lib/flags';
-import { prefetchMboxes, setTargetCookies } from 'lib/adobe-api';
+import { prefetchMboxes, setTargetCookies } from 'lib/adobe/rest-api';
 
 const flagsMap = {
   default: 'exp-a',

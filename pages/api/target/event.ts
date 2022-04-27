@@ -1,6 +1,10 @@
-import crypto from 'crypto';
-import { getCookies, getOffers, sendNotifications } from 'lib/adobe-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import crypto from 'crypto';
+import {
+  getCookies,
+  getOffers,
+  sendNotifications,
+} from 'lib/adobe/node-client';
 
 /**
  * API route that handles sending events to Target without addinga client in the browser
