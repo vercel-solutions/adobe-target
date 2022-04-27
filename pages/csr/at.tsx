@@ -58,7 +58,6 @@ export default function CSRAt({ blocking = false }: { blocking: boolean }) {
           b: 2,
         },
         success(offer) {
-          console.log('OFFER', offer);
           const offerObj = offer[0]?.content[0];
 
           if (offerObj && offerObj.enabled) {
