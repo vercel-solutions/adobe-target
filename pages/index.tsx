@@ -18,6 +18,11 @@ export default function Index() {
           </Link>
         </li>
         <li className="mb-2.5">
+          <Link href="/ssg">
+            /ssg: SSG + Middleware Rewrites, events are sent using API Routes
+          </Link>
+        </li>
+        <li className="mb-2.5">
           <Link href="/csr/at">/csr/at: CSR Page with at.js</Link>
         </li>
         <li className="mb-2.5">
@@ -31,7 +36,7 @@ export default function Index() {
         </li>
         <li className="mb-2.5">
           <Link href="/ssr">
-            /ssr/at: SSR Page where events are sent using API Routes
+            /ssr: SSR Page where events are sent using API Routes
           </Link>
         </li>
       </List>
@@ -52,6 +57,11 @@ export default function Index() {
           >
             Target Edge Network
           </Link>
+        </li>
+        <li className="mb-2.5">
+          The difference between <Code>/static-rewrites</Code> and{' '}
+          <Code>/ssg</Code> is only that the latter is using dynamic routes over
+          predefined pages
         </li>
         <li className="mb-2.5">
           Pages that have <Code>at.js</Code> will have a larger JS footprint as
