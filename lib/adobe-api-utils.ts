@@ -24,6 +24,10 @@ export function getSessionId(cookies: Record<string, string>) {
   return sessionId || crypto.randomUUID();
 }
 
+export function parseTargetCookie(cookies: Record<string, string>) {
+  return cookies[TARGET_COOKIE]?.split('|')[1]?.split('#')[1];
+}
+
 export function getTargetCookie(
   sessionId: string,
   id: { tntId: string }

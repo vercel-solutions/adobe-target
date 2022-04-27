@@ -47,7 +47,7 @@ export default function SSRAt({ flag }) {
         // });
       }
     }
-  }, [target, flag]);
+  }, [router.isReady, target, flag]);
 
   const expValue = flag?.enabled ? flag.name : 'default';
 

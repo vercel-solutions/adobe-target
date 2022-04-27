@@ -29,7 +29,7 @@ export default function SSRAt({ flag }) {
     if (!done && router.isReady && flag) {
       setDone(true);
     }
-  }, [flag]);
+  }, [router.isReady, flag]);
 
   const handleClick = async () => {
     await fetch('/api/target/event', {

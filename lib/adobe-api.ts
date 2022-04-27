@@ -3,6 +3,7 @@ import {
   getSessionId,
   getTargetCookie,
   getTargetLocationHintCookie,
+  parseTargetCookie,
 } from './adobe-api-utils';
 
 const client = process.env.TARGET_CLIENT;
@@ -51,7 +52,11 @@ export async function prefetchMboxes({
 }) {
   sessionId = sessionId || getSessionId(cookies);
 
-  const data = await fetchTargetDeliveryAPI({ sessionId }, body);
+  const tntId = parseTargetCookie(cookies);
+  const data = await fetchTargetDeliveryAPI(
+    { sessionId },
+    tntId ? { id: { tntId, ...body.id }, ...body } : body
+  );
 
   return {
     targetCookie: getTargetCookie(sessionId, data.id),
@@ -66,13 +71,13 @@ export function setTargetCookies(res: NextResponse, targetResponse: any) {
   // Set Target cookies
   if (targetCookie?.value) {
     res.cookie(targetCookie.name, targetCookie.value, {
-      maxAge: targetCookie.maxAge,
+      maxAge: targetCookie.maxAge * 1000,
       path: '/',
     });
   }
   if (targetLocationHintCookie?.value) {
     res.cookie(targetLocationHintCookie.name, targetLocationHintCookie.value, {
-      maxAge: targetLocationHintCookie.maxAge,
+      maxAge: targetLocationHintCookie.maxAge * 1000,
       path: '/',
     });
   }

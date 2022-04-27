@@ -2,8 +2,9 @@ import crypto from 'crypto';
 import { getCookies, getOffers, sendNotifications } from 'lib/adobe-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-// Write an API route that uses the Target client
-// to get an offer and click on that offer.
+/**
+ * API route that handles sending events to Target without addinga client in the browser
+ */
 export default async function event(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).end('Method Not Allowed');
@@ -15,9 +16,14 @@ export default async function event(req: NextApiRequest, res: NextApiResponse) {
     return res.status(401).send('Missing target cookie');
   }
 
-  const { mbox, type } = req.body;
+  const { mbox, type, eventToken } = req.body;
 
-  if (!mbox || type !== 'click') {
+  const isPageView = type === 'display';
+  const isEvent = type === 'click';
+
+  console.log('XX', req.body);
+
+  if (!mbox || !(isPageView || isEvent)) {
     return res.status(400).end();
   }
 
@@ -41,6 +47,14 @@ export default async function event(req: NextApiRequest, res: NextApiResponse) {
     context: { channel: 'web' },
     notifications: mboxes.map((mbox) => {
       const { options = [], metrics = [] } = mbox;
+      const tokens = isPageView
+        ? options.map((option) => option.eventToken)
+        : metrics
+            .filter((metric: any) => metric.type === 'click')
+            .map((metric: any) => metric.eventToken);
+
+      if (!tokens.includes(eventToken)) tokens.push(eventToken);
+
       return {
         id: targetResult.response.id,
         impressionId: crypto.randomUUID(),
@@ -48,14 +62,14 @@ export default async function event(req: NextApiRequest, res: NextApiResponse) {
           url: req.headers.host,
         },
         timestamp: Date.now(),
-        type,
+        type: isPageView ? 'display' : type,
         mbox: { name: mbox.name },
-        tokens: metrics
-          .filter((metric: any) => metric.type === 'click')
-          .map((metric: any) => metric.eventToken),
+        tokens,
       };
     }),
   };
+
+  console.log('YE', JSON.stringify(request, null, 2));
 
   // send the notification event
   // Note: this currently fails with "Error: Notifications array is required in request" but
