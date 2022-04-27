@@ -37,7 +37,7 @@ export default function CSRAt({ blocking = false }: { blocking: boolean }) {
       //       prefetch: {
       //         mboxes: [
       //           {
-      //             index: 0,
+      //             index: 1,
       //             name: STORE_CLOSED,
       //           },
       //         ],

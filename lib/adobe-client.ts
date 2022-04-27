@@ -66,9 +66,8 @@ export default async function getTargetClient() {
 }
 
 export const getCookies = (cookies: Record<string, string>) => ({
-  targetCookie: cookies[encodeURIComponent(targetClient.TargetCookieName)],
-  targetLocationHintCookie:
-    cookies[encodeURIComponent(targetClient.TargetLocationHintCookieName)],
+  targetCookie: cookies[targetClient.TargetCookieName],
+  targetLocationHintCookie: cookies[targetClient.TargetLocationHintCookieName],
 });
 
 function setTargetCookies(res: ServerResponse, targetResponse: any) {
@@ -78,18 +77,20 @@ function setTargetCookies(res: ServerResponse, targetResponse: any) {
   res.setHeader(
     'Set-Cookie',
     [
-      cookie.serialize(targetCookie.name, targetCookie.value, {
-        maxAge: targetCookie.maxAge,
-        path: '/',
-      }),
-      cookie.serialize(
-        targetLocationHintCookie.name,
-        targetLocationHintCookie.value,
-        {
-          maxAge: targetLocationHintCookie.maxAge,
+      targetCookie?.value &&
+        cookie.serialize(targetCookie.name, targetCookie.value, {
+          maxAge: targetCookie.maxAge,
           path: '/',
-        }
-      ),
+        }),
+      targetLocationHintCookie?.value &&
+        cookie.serialize(
+          targetLocationHintCookie.name,
+          targetLocationHintCookie.value,
+          {
+            maxAge: targetLocationHintCookie.maxAge,
+            path: '/',
+          }
+        ),
     ].filter(Boolean)
   );
 }

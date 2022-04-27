@@ -1,10 +1,58 @@
-import { NextRequest, NextResponse } from 'next/server'
-import get from 'lib/redis'
+import { NextRequest, NextResponse } from 'next/server';
+import { STORE_CLOSED } from 'lib/flags';
+import { prefetchMboxes, setTargetCookies } from 'lib/adobe-api';
+
+const flagsMap = {
+  default: 'exp-a',
+  expA: 'exp-a',
+  expB: 'exp-b',
+};
 
 export async function middleware(req: NextRequest) {
-  if (await get('store-closed')) {
-    const url = req.nextUrl.clone()
-    url.pathname = `/_closed`
-    return NextResponse.rewrite(url)
+  const url = req.nextUrl.clone();
+
+  url.pathname = `/static/rewrites/${flagsMap.default}`;
+
+  try {
+    const mboxes = await prefetchMboxes({
+      cookies: req.cookies,
+      body: {
+        context: {
+          channel: 'web',
+          address: {
+            url: 'http://demo.dev.tt-demo.com/demo/store/index.html',
+          },
+        },
+        prefetch: {
+          mboxes: [
+            {
+              name: STORE_CLOSED,
+              index: 1,
+            },
+          ],
+        },
+      },
+    });
+
+    console.log('RES', JSON.stringify(mboxes, null, 2));
+
+    const mbox = mboxes.data.prefetch.mboxes[0];
+    const option = mbox.options?.[0];
+
+    if (option && option.content.enabled) {
+      url.pathname = `/static-rewrites/${flagsMap[option.content.flag]}`;
+    }
+
+    const res = NextResponse.rewrite(url);
+
+    setTargetCookies(res, mboxes);
+
+    return res;
+  } catch (error) {
+    // In the case there's an error with Target, we don't want to crash our app but let the
+    // middleware continue and render the default content
+    console.error(error);
+    // Rewrite to the default page
+    return NextResponse.rewrite(url);
   }
 }
