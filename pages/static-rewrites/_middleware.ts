@@ -12,6 +12,13 @@ export async function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
   const { href, pathname } = req.nextUrl;
 
+  // Prevent internals from being accessed canonically
+  if (pathname !== '/static-rewrites') {
+    // Trigger a 404 by rewriting to a path that doesn't exist
+    url.pathname = '/404';
+    return NextResponse.rewrite(url);
+  }
+
   url.pathname = `/static-rewrites/${flagsMap.default}`;
 
   try {
