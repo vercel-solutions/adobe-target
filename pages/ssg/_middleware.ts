@@ -2,24 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import { STORE_CLOSED } from 'lib/flags';
 import { prefetchMboxes, setTargetCookies } from 'lib/adobe/rest-api';
 
-const flagsMap = {
-  default: 'exp-a',
-  expA: 'exp-a',
-  expB: 'exp-b',
-};
+const defaultPath = 'expA';
 
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
   const { href, pathname } = req.nextUrl;
 
   // Prevent internals from being accessed canonically
-  if (pathname !== '/static-rewrites') {
+  if (pathname !== '/ssg') {
     // Trigger a 404 by rewriting to a path that doesn't exist
     url.pathname = '/404';
     return NextResponse.rewrite(url);
   }
 
-  url.pathname = `/static-rewrites/${flagsMap.default}`;
+  url.pathname = `/ssg/${defaultPath}`;
 
   try {
     // Prefetching mboxes doens't count as a visit, this is important as we should only
@@ -49,7 +45,7 @@ export async function middleware(req: NextRequest) {
     const option = mbox.options?.[0];
 
     if (option?.content.enabled) {
-      url.pathname = `/static-rewrites/${flagsMap[option.content.flag]}`;
+      url.pathname = `/ssg/${option.content.flag}`;
     }
 
     const res = NextResponse.rewrite(url);

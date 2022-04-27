@@ -25,8 +25,6 @@ export default async function event(req: NextApiRequest, res: NextApiResponse) {
   const isPageView = type === 'display';
   const isEvent = type === 'click';
 
-  console.log('XX', req.body);
-
   if (!mbox || !(isPageView || isEvent)) {
     return res.status(400).end();
   }
@@ -73,12 +71,10 @@ export default async function event(req: NextApiRequest, res: NextApiResponse) {
     }),
   };
 
-  console.log('YE', JSON.stringify(request, null, 2));
-
   // send the notification event
   // Note: this currently fails with "Error: Notifications array is required in request" but
   // that's not clear enough as request.notifications is an array of objects.
-  await sendNotifications({ request }).catch((e) => console.log('OMG', e));
+  await sendNotifications({ request });
 
   res.status(200).json({ done: true });
 }
