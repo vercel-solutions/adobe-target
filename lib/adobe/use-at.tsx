@@ -2,6 +2,7 @@ import { FC, createContext, useContext, useState, useEffect } from 'react';
 import Script, { ScriptProps } from 'next/script';
 
 const adobeAtContext = createContext<any>(undefined);
+const isProd = process.env.NODE_ENV === 'production';
 
 export const AdobeAtProvider: FC<ScriptProps> = ({ children, ...props }) => {
   const [client, setClient] = useState();
@@ -22,7 +23,8 @@ export const AdobeAtProvider: FC<ScriptProps> = ({ children, ...props }) => {
         // we don't need to hide the body
         <Script>{`
           window.targetGlobalSettings = {
-            bodyHidingEnabled: false
+            bodyHidingEnabled: false,
+            ${isProd ? 'cookieDomain: ab-testing-adobe-target.vercel.app' : ''}
           };
         `}</Script>
       )}
