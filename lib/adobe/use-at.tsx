@@ -24,7 +24,9 @@ export const AdobeAtProvider: FC<ScriptProps> = ({ children, ...props }) => {
         <Script>{`
           window.targetGlobalSettings = {
             bodyHidingEnabled: false,
-            ${isProd ? 'cookieDomain: ab-testing-adobe-target.vercel.app' : ''}
+            ${
+              isProd ? `cookieDomain: 'ab-testing-adobe-target.vercel.app'` : ''
+            }
           };
         `}</Script>
       )}
